@@ -1,15 +1,15 @@
-FROM node:alpine3.22
+FROM node:18-alpine
 
-WORKDIR /tmp
+WORKDIR /app
 
-COPY index.js index.html package.json ./
+COPY package.json ./
+RUN npm install
 
-EXPOSE 3000/tcp
+COPY index.js index.html ./
 
-RUN apk update && apk upgrade &&\
-    apk add --no-cache openssl curl gcompat iproute2 coreutils &&\
-    apk add --no-cache bash &&\
-    chmod +x index.js &&\
-    npm install
+# 运行时依赖（argo 隧道 / cloudflared 需要）
+RUN apk add --no-cache openssl curl gcompat iproute2 coreutils bash
+
+EXPOSE 3000
 
 CMD ["node", "index.js"]
